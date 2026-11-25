@@ -1,0 +1,92 @@
+{
+  "bindings": {
+    "dtlsFingerprints": {
+      "binding": "4ada0de4b50638271c630c8eac1d88b70540de5a54717d24dc5d55d03653335c",
+      "host": "2222222222222222222222222222222222222222222222222222222222222222",
+      "viewer": "1111111111111111111111111111111111111111111111111111111111111111"
+    },
+    "tlsExporter": {
+      "binding": "c9b7e5ed15dd722456a7a548a2b29a8d96e6d42d1d62e4933aa4074e8d3181c9",
+      "ekm": "4242424242424242424242424242424242424242424242424242424242424242"
+    }
+  },
+  "description": "Moon Remote session auth vectors; see crates/moonrd-session/src/pake.rs. RNG: SHA-256(seed || u64be counter) blocks; each side draws its SPAKE2 scalar as curve25519-dalek Scalar::random (64 RNG bytes reduced mod l). Group, M/N constants and transcript hash follow the RustCrypto spake2 0.4 crate (python-spake2 compatible).",
+  "handshakes": [
+    {
+      "binding": "c9b7e5ed15dd722456a7a548a2b29a8d96e6d42d1d62e4933aa4074e8d3181c9",
+      "hostAccepts": true,
+      "hostConfirmation": "66402901a221ed28e051e27b3bcf4a6e58126f9e973c60c2220a6abcd56f504b",
+      "hostMessage": "4225dfb168a5d02d60aade2a2cd740e68b3ff1fd5dd020d0025cf0d4a3382fe438",
+      "hostRngSeed": "pin-ok/host",
+      "hostSecret": "d2d77cc55360aabd909517c7a4d9e853d98ed8aea7beaffcc409209031edf4ec",
+      "method": 1,
+      "name": "pin-ok",
+      "sessionKeyHost": "013dc2f688efd00cd63ecf4bfed1944ef6f4cd7facc7cf726cacac923626cd02",
+      "sessionKeyViewer": "013dc2f688efd00cd63ecf4bfed1944ef6f4cd7facc7cf726cacac923626cd02",
+      "viewerAccepts": true,
+      "viewerConfirmation": "0de938888232c4473dc6fb6f41f7360ec10f9e47cbf7706a3c15d63b8b39287e",
+      "viewerMessage": "41407c7526485cda5ace3b28a0628fdfcd0af5113dc02dda197b924d44582413cd",
+      "viewerRngSeed": "pin-ok/viewer",
+      "viewerSecret": "d2d77cc55360aabd909517c7a4d9e853d98ed8aea7beaffcc409209031edf4ec"
+    },
+    {
+      "binding": "c9b7e5ed15dd722456a7a548a2b29a8d96e6d42d1d62e4933aa4074e8d3181c9",
+      "hostAccepts": false,
+      "hostConfirmation": "fb67ad35ccbd2eb4e6f23eda8c53c8a3962cc9e22398f952f6df4af908e5e077",
+      "hostMessage": "424fb075a1cbe56e94ff97cffdebc674026290c02c451a65195faa5da30bdf8e7e",
+      "hostRngSeed": "pin-wrong/host",
+      "hostSecret": "d2d77cc55360aabd909517c7a4d9e853d98ed8aea7beaffcc409209031edf4ec",
+      "method": 1,
+      "name": "pin-wrong",
+      "sessionKeyHost": "f4f86b2bf9b1bdaa33ea58886e221ab73fffa9757dcffef1dd0b96ad0532bd50",
+      "sessionKeyViewer": "7b45c9c65de096d9aafdfaef0ac6cbb303100040a85e89cd59949eb30f6c6290",
+      "viewerAccepts": false,
+      "viewerConfirmation": "33c29720928197801f354ef1bece1c9403156221d01ab9d71e7386390337a0ad",
+      "viewerMessage": "41a0753ae8353ce98e234a40e8c0e7c0ce2b24d130e2639b3a49fb2c5b04cf82ce",
+      "viewerRngSeed": "pin-wrong/viewer",
+      "viewerSecret": "cd94128f6a5ab16af00c24039c87cf4d55c93758cff50bf723dc354c4c1c957e"
+    },
+    {
+      "binding": "4ada0de4b50638271c630c8eac1d88b70540de5a54717d24dc5d55d03653335c",
+      "hostAccepts": true,
+      "hostConfirmation": "51174527d2ff8979dda0aeecb2c8df3f201174b5826bab0365c242a5cf0f7138",
+      "hostMessage": "42b6b0eba0923517ff70c57574f74cd41558576f4f0ba118b59b97d09f865159c8",
+      "hostRngSeed": "support-code-webrtc/host",
+      "hostSecret": "d2d77cc55360aabd909517c7a4d9e853d98ed8aea7beaffcc409209031edf4ec",
+      "method": 3,
+      "name": "support-code-webrtc",
+      "sessionKeyHost": "c60568d01a0b2d3deced564905e4c4fff30c307ff5cdbf6df9c6b1340530cb58",
+      "sessionKeyViewer": "c60568d01a0b2d3deced564905e4c4fff30c307ff5cdbf6df9c6b1340530cb58",
+      "viewerAccepts": true,
+      "viewerConfirmation": "242675c00b5d046fcdd6a09be49809f5102d0482efed374e053c94ac00cf426e",
+      "viewerMessage": "41c01df825f013945f88b9aad454d0994b98e5f29b6f7926ee903ceb1ca271407f",
+      "viewerRngSeed": "support-code-webrtc/viewer",
+      "viewerSecret": "d2d77cc55360aabd909517c7a4d9e853d98ed8aea7beaffcc409209031edf4ec"
+    },
+    {
+      "binding": "c9b7e5ed15dd722456a7a548a2b29a8d96e6d42d1d62e4933aa4074e8d3181c9",
+      "hostAccepts": true,
+      "hostConfirmation": "820f02d141bb9e66fb2ba548e67c330d034c55850d4e6b4e714c41e484aa9c94",
+      "hostMessage": "429094975ecb64bbe9526d5b729965a08e8f4aeca4dbc02118f76de99a96cf307c",
+      "hostRngSeed": "pairing/host",
+      "hostSecret": "0707070707070707070707070707070707070707070707070707070707070707",
+      "method": 2,
+      "name": "pairing",
+      "sessionKeyHost": "d87f85c19d353fe0b3ba69435089919f3c54e19a9628eef81f37663caedd672b",
+      "sessionKeyViewer": "d87f85c19d353fe0b3ba69435089919f3c54e19a9628eef81f37663caedd672b",
+      "viewerAccepts": true,
+      "viewerConfirmation": "28aa9eae55726b5b9256fd13a863016901dbc57da92df3b6df3ae7e139b01eff",
+      "viewerMessage": "414cbfc662ec3dc7106af64903e5ff48261a9db0baefc016f0ccab60b992a30dec",
+      "viewerRngSeed": "pairing/viewer",
+      "viewerSecret": "0707070707070707070707070707070707070707070707070707070707070707"
+    }
+  ],
+  "kdf": {
+    "iterations": 2,
+    "memoryKib": 19456,
+    "parallelism": 1,
+    "pin": "482916",
+    "salt": "6d6f6f6e72642d746573742d73616c74",
+    "w": "d2d77cc55360aabd909517c7a4d9e853d98ed8aea7beaffcc409209031edf4ec"
+  }
+}

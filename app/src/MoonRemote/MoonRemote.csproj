@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\MoonRemote.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Lets the trim / AOT analyzers flag problems during normal builds, not only at publish time. -->
+    <IsAotCompatible>true</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\MoonRemote.ico;Assets\MoonRemote.png" />
+    <InternalsVisibleTo Include="MoonRemote.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lumen.UI" Version="$(LumenUiVersion)" />
+  </ItemGroup>
+
+  <!-- Publish profiles set DebugType=none; also drop debug symbols that come from packages
+       (SkiaSharp / HarfBuzz ship ~100 MB of native .pdb) and project references.
+       Written without Condition attributes on items: dotnet new evaluates those itself. -->
+  <Target Name="ExcludeSymbolsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList" Condition="'$(DebugType)' == 'none'">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish->WithMetadataValue('Extension', '.pdb'))" />
+    </ItemGroup>
+  </Target>
+
+</Project>

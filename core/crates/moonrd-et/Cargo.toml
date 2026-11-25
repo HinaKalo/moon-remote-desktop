@@ -1,0 +1,10 @@
+[package]
+name = "moonrd-et"
+description = "Supervises the bundled easytier-core companion process: launch arguments, port selection, and detection of a user's own EasyTier install."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]

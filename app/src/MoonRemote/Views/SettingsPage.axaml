@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="https://github.com/HinaKalo/lumen"
+             xmlns:vm="using:MoonRemote.ViewModels"
+             x:Class="MoonRemote.Views.SettingsPage"
+             x:DataType="vm:SettingsPageViewModel"
+             x:Name="Root">
+  <ScrollViewer>
+    <StackPanel Classes="page">
+      <l:SectionHeader Title="Settings" Description="Appearance preferences apply instantly." />
+
+      <l:Card Header="Appearance">
+        <StackPanel Spacing="20" Margin="0,8,0,0">
+          <l:FormField Label="Theme">
+            <l:SegmentedControl SelectedIndex="{Binding ThemeIndex}" HorizontalAlignment="Left">
+              <l:SegmentedItem Content="System" />
+              <l:SegmentedItem Content="Light" />
+              <l:SegmentedItem Content="Dark" />
+            </l:SegmentedControl>
+          </l:FormField>
+
+          <l:FormField Label="Accent color">
+            <ItemsControl ItemsSource="{Binding Accents}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="l:AccentPreset">
+                  <Button Classes="ghost icon"
+                          Margin="0,0,6,6"
+                          ToolTip.Tip="{Binding Name}"
+                          Command="{Binding #Root.((vm:SettingsPageViewModel)DataContext).SetAccentCommand}"
+                          CommandParameter="{Binding}">
+                    <Ellipse Width="20" Height="20">
+                      <Ellipse.Fill>
+                        <SolidColorBrush Color="{Binding Color}" />
+                      </Ellipse.Fill>
+                    </Ellipse>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </l:FormField>
+        </StackPanel>
+      </l:Card>
+
+      <l:Card Header="Updates" Description="Moon Remote updates verified with Ed25519 signatures.">
+        <StackPanel Spacing="10" Margin="0,8,0,0" MaxWidth="520" HorizontalAlignment="Left">
+          <TextBlock Text="{Binding UpdateStatus}" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Check for Updates"
+                    IsEnabled="{Binding !IsCheckingUpdate}"
+                    Command="{Binding CheckForUpdatesCommand}" />
+            <Button Classes="primary" Content="Download &amp; Install"
+                    IsVisible="{Binding CanInstallUpdate}"
+                    IsEnabled="{Binding !IsCheckingUpdate}"
+                    Command="{Binding InstallUpdateCommand}" />
+            <Button Classes="ghost" Content="Full installer"
+                    IsVisible="{Binding HasFullInstaller}"
+                    IsEnabled="{Binding !IsCheckingUpdate}"
+                    Command="{Binding InstallFullUpdateCommand}" />
+            <Button Classes="ghost" Content="{Binding BrowserDownloadText}"
+                    Command="{Binding OpenBrowserDownloadCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </l:Card>
+
+      <l:Card Header="Server &amp; Diagnostics" Description="Server endpoint and local EasyTier coexistence check.">
+        <StackPanel Spacing="12" Margin="0,8,0,0" MaxWidth="520" HorizontalAlignment="Left">
+          <l:FormField Label="Server URL">
+            <TextBox Text="{Binding ServerUrl}" />
+          </l:FormField>
+          <Button Content="Run Diagnostics" HorizontalAlignment="Left" Command="{Binding RunDiagnosticsCommand}" />
+          <TextBox Text="{Binding DiagnosticsText}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" />
+        </StackPanel>
+      </l:Card>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

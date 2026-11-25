@@ -1,0 +1,29 @@
+# Rust
+/core/target/
+
+# Go
+/server/bin/
+
+# .NET (app/.gitignore covers bin/obj inside app/)
+/artifacts/
+
+# Spikes: downloaded third-party binaries and build output
+/spikes/*/vendor/
+/spikes/*/target/
+
+# Local secrets (relhub token, deploy settings)
+*.local.env
+release.local.env
+
+# Editors / OS
+.vs/
+.idea/
+*.swp
+Thumbs.db
+
+# Fetched third-party binaries (scripts/fetch-easytier.ps1)
+/third_party/easytier/
+
+# Web controller (Vite / npm)
+/server/web/node_modules/
+/server/web/dist/

@@ -1,0 +1,31 @@
+[package]
+name = "moonrd-ffi"
+description = "C ABI cdylib for MoonRemote (C# Lumen UI): native viewer QUIC session, SPAKE2 auth, H.264 DXVA decode & D3D11 HWND rendering, EasyTier diagnostics."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+moonrd-et = { path = "../moonrd-et" }
+moonrd-media = { path = "../moonrd-media" }
+moonrd-proto = { path = "../moonrd-proto" }
+moonrd-session = { path = "../moonrd-session" }
+moonrd-transport = { path = "../moonrd-transport" }
+base64 = "0.22"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "time", "process"] }
+tempfile = "3"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = ["Win32_Foundation"] }
+
+[dev-dependencies]
+moonrd-service = { path = "../moonrd-service" }

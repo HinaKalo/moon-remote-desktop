@@ -1,0 +1,135 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="https://github.com/HinaKalo/lumen"
+        xmlns:vm="using:MoonRemote.ViewModels"
+        xmlns:c="using:MoonRemote.Controls"
+        xmlns:m="using:MoonRemote.Models"
+        x:Class="MoonRemote.Views.RemoteSessionWindow"
+        x:DataType="vm:RemoteSessionViewModel"
+        Title="{Binding HostName, StringFormat='Moon Remote — {0}'}"
+        Icon="/Assets/MoonRemote.ico"
+        Width="1280" Height="780"
+        MinWidth="640" MinHeight="420"
+        WindowStartupLocation="CenterScreen">
+  <Window.Styles>
+    <Style Selector="Button.toolbar-icon">
+      <Setter Property="Width" Value="34" />
+      <Setter Property="Height" Value="36" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="ToggleButton.mouse-control:checked">
+      <Setter Property="Background" Value="{DynamicResource Lumen.Brush.AccentSubtle}" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.AccentText}" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*">
+    <Border x:Name="Toolbar" Padding="12,8" BorderThickness="0,0,0,1"
+            Background="{DynamicResource Lumen.Brush.SurfaceElevated}"
+            BorderBrush="{DynamicResource Lumen.Brush.Border}">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9" VerticalAlignment="Center">
+          <Image Source="/Assets/MoonRemote.png" Width="30" Height="30" />
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+            <TextBlock Text="{Binding HostName}" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"
+                       ToolTip.Tip="{Binding HostName}" />
+            <TextBlock Text="{Binding ConnectionState}" FontSize="11" TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource Lumen.Brush.TextSecondary}" ToolTip.Tip="{Binding ConnectionState}" />
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <ComboBox x:Name="DisplayPicker" ItemsSource="{Binding Displays}" SelectedItem="{Binding SelectedDisplay}"
+                    IsEnabled="{Binding CanSelectDisplay}" IsVisible="{Binding InputEnabled}"
+                    Width="166" PlaceholderText="Display" AutomationProperties.Name="Remote display"
+                    ToolTip.Tip="Switch the display on the remote computer">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="m:DisplayInfo">
+                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <ToggleButton Classes="mouse-control" IsChecked="{Binding UseControllerMouse, Mode=TwoWay}"
+                        IsEnabled="{Binding InputEnabled}" MinWidth="102" HorizontalContentAlignment="Center"
+                        ToolTip.Tip="Send this computer’s mouse input to the remote desktop"
+                        AutomationProperties.Name="Use controller mouse">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <l:Icon Kind="MousePointer" Size="15" />
+              <TextBlock Text="Mouse on" IsVisible="{Binding UseControllerMouse}" />
+              <TextBlock Text="Mouse off" IsVisible="{Binding !UseControllerMouse}" />
+            </StackPanel>
+          </ToggleButton>
+          <Button Classes="primary" IsEnabled="{Binding InputEnabled}" Click="OnTypeTextClick"
+                  ToolTip.Tip="Send text · Ctrl+Shift+Enter" AutomationProperties.Name="Send text">
+            <StackPanel Orientation="Horizontal" Spacing="7">
+              <l:Icon Kind="Type" Size="15" />
+              <TextBlock Text="Send text" />
+              <Border x:Name="ShortcutLabel" CornerRadius="4" Background="#24FFFFFF" Padding="4,1">
+                <TextBlock Text="Ctrl+Shift+↵" FontSize="10" VerticalAlignment="Center" />
+              </Border>
+            </StackPanel>
+          </Button>
+          <Button Classes="ghost toolbar-icon" IsEnabled="{Binding InputEnabled}" Click="OnFullScreenClick"
+                  ToolTip.Tip="Full screen · F11" AutomationProperties.Name="Full screen">
+            <l:Icon Kind="Square" Size="16" />
+          </Button>
+          <Button Classes="ghost toolbar-icon" IsEnabled="{Binding InputEnabled}"
+                  ToolTip.Tip="Host actions" AutomationProperties.Name="Host actions">
+            <l:Icon Kind="MoreHorizontal" Size="18" />
+            <Button.Flyout>
+              <MenuFlyout>
+                <MenuItem Header="Send Ctrl+Alt+Del" Command="{Binding SendCtrlAltDelCommand}" />
+                <MenuItem Header="Lock remote computer" Command="{Binding LockHostCommand}" />
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
+          <Border BorderThickness="1,0,0,0" Margin="0,5" BorderBrush="{DynamicResource Lumen.Brush.Border}" />
+          <Button Classes="ghost toolbar-icon" Click="OnDisconnectClick"
+                  ToolTip.Tip="Disconnect" AutomationProperties.Name="Disconnect">
+            <l:Icon Kind="LogOut" Size="16" Foreground="{DynamicResource Lumen.Brush.Danger}" />
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="1" Padding="14,9" Background="{DynamicResource Lumen.Brush.SurfaceSubtle}"
+            IsVisible="{Binding BannerMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <l:Icon Kind="Info" Size="15" />
+        <TextBlock Text="{Binding BannerMessage}" TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="2">
+      <Grid Background="Black" x:Name="VideoArea" IsVisible="{Binding InputEnabled}">
+        <c:RemoteVideoHost x:Name="VideoHost" Focusable="True" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Grid>
+      <Grid Background="{DynamicResource Lumen.Brush.SurfaceSubtle}" IsVisible="{Binding !InputEnabled}">
+        <Border Background="{DynamicResource Lumen.Brush.SurfaceElevated}"
+                BorderBrush="{DynamicResource Lumen.Brush.Border}" BorderThickness="1"
+                Width="360" Padding="24" CornerRadius="14"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                IsVisible="{Binding ShowPinPrompt}">
+          <StackPanel Spacing="12">
+            <l:Icon Kind="Lock" Size="22" Foreground="{DynamicResource Lumen.Brush.Accent}" HorizontalAlignment="Left" />
+            <TextBlock Text="Unlock remote desktop" FontSize="18" FontWeight="SemiBold" />
+            <TextBox x:Name="PinEntry" Text="{Binding PinInput}" PasswordChar="•" MaxLength="12"
+                     PlaceholderText="Host PIN · 6–12 digits" AutomationProperties.Name="Host PIN" />
+            <CheckBox Content="Remember this controller on this PC" IsVisible="{Binding CanRememberDevice}"
+                      IsChecked="{Binding RememberDevice}" />
+            <Button Classes="primary" Content="Unlock" HorizontalAlignment="Right"
+                    IsDefault="True" Command="{Binding SubmitPinCommand}" />
+          </StackPanel>
+        </Border>
+        <StackPanel IsVisible="{Binding CanReconnect}" Spacing="12"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+          <TextBlock Text="{Binding ConnectionState}" HorizontalAlignment="Center" />
+          <Button Classes="primary" Content="Reconnect" HorizontalAlignment="Center"
+                  Command="{Binding ReconnectCommand}" />
+        </StackPanel>
+      </Grid>
+    </Grid>
+  </Grid>
+</Window>

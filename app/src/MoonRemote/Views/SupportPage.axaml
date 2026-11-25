@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="https://github.com/HinaKalo/lumen"
+             xmlns:vm="using:MoonRemote.ViewModels"
+             x:Class="MoonRemote.Views.SupportPage"
+             x:DataType="vm:SupportPageViewModel">
+  <ScrollViewer>
+    <StackPanel Classes="page" Spacing="16">
+      <l:SectionHeader Title="Remote Support"
+                       Description="{Binding StatusMessage}" />
+
+      <l:Card Header="Share This Screen" Description="Generate a 12-digit one-time code valid for 5 minutes. No administrator rights required.">
+        <StackPanel Spacing="12" Margin="0,8,0,0" MaxWidth="420" HorizontalAlignment="Left">
+          <Button Classes="primary" Content="Generate Support Code"
+                  IsEnabled="{Binding !IsBusy}"
+                  Command="{Binding GenerateCodeCommand}" />
+          <TextBox Text="{Binding GeneratedCode}" IsReadOnly="True" FontSize="22" FontWeight="Bold"
+                   IsVisible="{Binding GeneratedCode, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+      </l:Card>
+
+      <l:Card Header="Give Support" Description="Enter the 12-digit code shared by the other person.">
+        <StackPanel Spacing="12" Margin="0,8,0,0" MaxWidth="420" HorizontalAlignment="Left">
+          <l:FormField Label="Support Code">
+            <TextBox Text="{Binding EnterCode}" PlaceholderText="0000 0000 0000" />
+          </l:FormField>
+          <Button Classes="primary" Content="Connect"
+                  IsEnabled="{Binding !IsBusy}"
+                  Command="{Binding RedeemCodeCommand}" />
+        </StackPanel>
+      </l:Card>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

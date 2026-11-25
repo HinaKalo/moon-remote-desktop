@@ -1,0 +1,29 @@
+[package]
+name = "moonrd-agent"
+description = "Moon Remote in-session host agent: follows desktop switches, captures/encodes H.264, injects keyboard/mouse input, and syncs clipboard."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "moonrd-agent"
+path = "src/main.rs"
+
+[dependencies]
+moonrd-media = { path = "../moonrd-media" }
+moonrd-proto = { path = "../moonrd-proto" }
+moonrd-session = { path = "../moonrd-session" }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "sync", "time"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_System_DataExchange",
+    "Win32_System_Memory",
+    "Win32_System_Shutdown",
+    "Win32_System_StationsAndDesktops",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_WindowsAndMessaging",
+] }

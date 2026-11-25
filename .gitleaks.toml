@@ -1,0 +1,7 @@
+# gitleaks：默认规则 + 只放行 SPAKE2 协议的确定性测试向量文件
+[extend]
+useDefault = true
+
+[allowlist]
+description = "SPAKE2 test vectors (deterministic, published protocol test data)"
+paths = ['''core/crates/moonrd-session/testdata/pake-vectors\.json''']

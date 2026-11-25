@@ -1,0 +1,12 @@
+[package]
+name = "packet-stub"
+description = "No-op replacement for Npcap's Packet.dll, so the bundled easytier-core/cli load without Npcap code (only EasyTier's experimental faketcp tunnel needs it; we do not use it)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "packet"
+crate-type = ["cdylib"]

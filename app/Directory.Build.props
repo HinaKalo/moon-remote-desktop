@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!-- Versions live in the .csproj; stay independent of any parent repo's central package management. -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <Version>0.1.0</Version>
+
+    <!-- Lumen.UI NuGet package version. -->
+    <LumenUiVersion>0.1.0</LumenUiVersion>
+  </PropertyGroup>
+</Project>

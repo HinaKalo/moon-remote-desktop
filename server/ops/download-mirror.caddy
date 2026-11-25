@@ -1,0 +1,15 @@
+# Import inside the remote.moonl.cloud site. Only public Moon Remote artifacts
+# and release checks are forwarded here.
+@moon_remote_updates {
+	method GET HEAD
+	path_regexp moonRemoteUpdates ^/updates/v1/apps/moon-remote/(check|[a-z0-9_-]+/(releases/[0-9]+|latest)/download)$
+}
+handle @moon_remote_updates {
+	uri strip_prefix /updates
+	reverse_proxy 127.0.0.1:18790 {
+		header_up -Authorization
+		header_up -Cookie
+		header_down -Set-Cookie
+		header_down Location "^(?:https://release[.]moonl[.]cloud)?(/v1/apps/moon-remote/.*)$" "/updates$1"
+	}
+}

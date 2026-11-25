@@ -1,0 +1,31 @@
+[package]
+name = "moonrd-host"
+description = "Lightweight host-only Moon Remote plugin: auto-starts on boot, runs the host network + capture agent, and provides a tiny local web setup wizard."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "moonrd-host"
+path = "src/main.rs"
+
+[dependencies]
+moonrd-service = { path = "../moonrd-service" }
+moonrd-session = { path = "../moonrd-session" }
+base64 = "0.22"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls-native-roots"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+tempfile = "3"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "sync", "time", "process"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_System_Registry",
+] }

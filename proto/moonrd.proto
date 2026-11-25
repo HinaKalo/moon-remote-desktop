@@ -1,0 +1,292 @@
+// Moon Remote Desktop session protocol, version 1.
+//
+// Shared by every transport (QUIC over EasyTier, QUIC over LAN, WebRTC data channel)
+// and every peer (Rust host, Rust native viewer, TypeScript web viewer).
+//
+// Framing: on reliable streams every message is a varint length prefix followed by one
+// encoded `Envelope`. Video travels on its own channel (QUIC stream per GOP or WebRTC
+// RTP H.264 track); only the WebRTC path skips `VideoFrame`, the rest of the messages
+// are identical on all transports.
+//
+// Order of a session:
+//   viewer → host  Hello
+//   host   → viewer HelloAck
+//   both          AuthMessage* (SPAKE2 with PIN / support code / pairing key) until AuthResult
+//   host   → viewer DisplayList, VideoConfig, then media
+//   both          input / clipboard / control messages until Bye
+syntax = "proto3";
+
+package moonrd.v1;
+
+message Envelope {
+  oneof msg {
+    Hello hello = 1;
+    HelloAck hello_ack = 2;
+    AuthMessage auth = 3;
+    AuthResult auth_result = 4;
+    DisplayList display_list = 5;
+    SelectDisplay select_display = 6;
+    VideoConfig video_config = 7;
+    VideoFrame video_frame = 8;
+    KeyframeRequest keyframe_request = 9;
+    QualityHint quality_hint = 10;
+    PointerEvent pointer = 11;
+    KeyEvent key = 12;
+    CursorShape cursor_shape = 13;
+    CursorPosition cursor_position = 14;
+    ClipboardData clipboard = 15;
+    SpecialAction special_action = 16;
+    Stats stats = 17;
+    Ping ping = 18;
+    Pong pong = 19;
+    Notice notice = 20;
+    Bye bye = 21;
+  }
+}
+
+// ---------------------------------------------------------------- handshake
+
+enum SessionKind {
+  SESSION_KIND_UNSPECIFIED = 0;
+  // Same-account unattended access; authenticated with the host PIN or a pairing key.
+  SESSION_KIND_REMOTE_ACCESS = 1;
+  // One-time support session; authenticated with the support code, host user must consent.
+  SESSION_KIND_SUPPORT = 2;
+}
+
+enum AuthMethod {
+  AUTH_METHOD_UNSPECIFIED = 0;
+  AUTH_METHOD_PIN = 1;
+  AUTH_METHOD_PAIRING = 2;
+  AUTH_METHOD_SUPPORT_CODE = 3;
+}
+
+enum Codec {
+  CODEC_UNSPECIFIED = 0;
+  CODEC_H264 = 1;
+}
+
+message Hello {
+  uint32 protocol_version = 1;          // 1
+  SessionKind kind = 2;
+  string viewer_device_id = 3;          // empty for web viewers
+  string viewer_display_name = 4;
+  string client_version = 5;            // e.g. "0.1.0+123"
+  repeated Codec codecs = 6;
+  repeated AuthMethod auth_methods = 7; // methods the viewer can do, preferred first
+  bytes pairing_id = 8;                 // set when the viewer holds a pairing key for this host
+}
+
+message HelloAck {
+  uint32 protocol_version = 1;
+  string host_device_id = 2;
+  string host_display_name = 3;
+  string host_version = 4;
+  AuthMethod auth_method = 5;           // chosen by the host
+  bytes pin_salt = 6;                   // Argon2id salt for AUTH_METHOD_PIN
+  Argon2Params argon2 = 7;
+  uint32 lockout_seconds = 8;           // > 0: host is locked out, viewer must wait
+}
+
+message Argon2Params {
+  uint32 memory_kib = 1;
+  uint32 iterations = 2;
+  uint32 parallelism = 3;
+}
+
+// SPAKE2 over ristretto255. The transcript binds the transport channel
+// (QUIC TLS exporter or both DTLS fingerprints), so a relay or signalling
+// server cannot sit in the middle without knowing the secret.
+message AuthMessage {
+  oneof step {
+    bytes spake2_message = 1;           // first flight from each side
+    bytes key_confirmation = 2;         // HMAC over the transcript with the confirmation key
+    PairingRequest pairing_request = 3; // viewer asks to be remembered after a PIN success
+    PairingGrant pairing_grant = 4;
+  }
+}
+
+message PairingRequest {
+  string viewer_label = 1;
+}
+
+message PairingGrant {
+  bytes pairing_id = 1;
+  bytes pairing_key = 2;                // sent only inside the authenticated channel
+}
+
+enum AuthStatus {
+  AUTH_STATUS_UNSPECIFIED = 0;
+  AUTH_STATUS_OK = 1;
+  AUTH_STATUS_BAD_SECRET = 2;
+  AUTH_STATUS_LOCKED_OUT = 3;
+  AUTH_STATUS_CONSENT_DENIED = 4;       // support session refused by the host user
+  AUTH_STATUS_NOT_ALLOWED = 5;          // e.g. viewer not on the signed device roster (LAN mode)
+}
+
+message AuthResult {
+  AuthStatus status = 1;
+  uint32 remaining_attempts = 2;
+  uint32 lockout_seconds = 3;
+}
+
+// ---------------------------------------------------------------- displays & video
+
+message Display {
+  uint32 id = 1;
+  string name = 2;
+  int32 x = 3;                          // virtual-desktop coordinates
+  int32 y = 4;
+  uint32 width = 5;
+  uint32 height = 6;
+  uint32 dpi = 7;
+  bool primary = 8;
+}
+
+message DisplayList {
+  repeated Display displays = 1;
+  uint32 active_id = 2;
+}
+
+message SelectDisplay {
+  uint32 id = 1;
+}
+
+message VideoConfig {
+  Codec codec = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  uint32 fps = 4;
+  uint32 bitrate_kbps = 5;
+  bool hardware = 6;
+  string encoder_name = 7;
+  uint32 display_id = 8;                // active capture output, 0 for older hosts
+}
+
+message VideoFrame {
+  uint64 sequence = 1;
+  uint64 capture_time_us = 2;           // host monotonic clock
+  bool keyframe = 3;
+  bytes data = 4;                       // Annex B access unit
+}
+
+message KeyframeRequest {
+  uint64 last_good_sequence = 1;
+}
+
+message QualityHint {
+  uint32 max_fps = 1;                   // 0 = no change
+  uint32 max_bitrate_kbps = 2;
+  uint32 max_width = 3;
+  uint32 max_height = 4;
+}
+
+// ---------------------------------------------------------------- input
+
+enum PointerButton {
+  POINTER_BUTTON_NONE = 0;
+  POINTER_BUTTON_LEFT = 1;
+  POINTER_BUTTON_RIGHT = 2;
+  POINTER_BUTTON_MIDDLE = 3;
+  POINTER_BUTTON_BACK = 4;
+  POINTER_BUTTON_FORWARD = 5;
+}
+
+message PointerEvent {
+  uint32 display_id = 1;
+  // Position normalised to the display: 0..65535 on each axis.
+  uint32 x = 2;
+  uint32 y = 3;
+  PointerButton button = 4;
+  bool pressed = 5;                     // meaningful when button != NONE
+  int32 wheel_x = 6;                    // WHEEL_DELTA units (120 per notch)
+  int32 wheel_y = 7;
+}
+
+message KeyEvent {
+  uint32 scancode = 1;                  // USB HID usage page 0x07 code
+  bool extended = 2;
+  bool pressed = 3;
+  uint32 lock_state = 4;                // bit 0 caps, bit 1 num, bit 2 scroll
+  string text = 5;                      // optional committed IME text; scancode ignored when set
+}
+
+message CursorShape {
+  uint64 id = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  uint32 hotspot_x = 4;
+  uint32 hotspot_y = 5;
+  bytes rgba = 6;                       // empty: reuse cached shape `id`
+}
+
+message CursorPosition {
+  uint32 display_id = 1;
+  uint32 x = 2;
+  uint32 y = 3;
+  bool visible = 4;
+}
+
+message ClipboardData {
+  string text = 1;
+}
+
+enum SpecialActionKind {
+  SPECIAL_ACTION_UNSPECIFIED = 0;
+  SPECIAL_ACTION_CTRL_ALT_DEL = 1;      // SendSAS, needs the host service
+  SPECIAL_ACTION_LOCK_WORKSTATION = 2;
+  SPECIAL_ACTION_BLOCK_LOCAL_INPUT = 3;
+  SPECIAL_ACTION_UNBLOCK_LOCAL_INPUT = 4;
+}
+
+message SpecialAction {
+  SpecialActionKind kind = 1;
+}
+
+// ---------------------------------------------------------------- control
+
+message Stats {
+  uint32 rtt_ms = 1;
+  uint32 fps = 2;
+  uint32 bitrate_kbps = 3;
+  uint32 decode_ms = 4;
+  uint32 frames_dropped = 5;
+}
+
+message Ping {
+  uint64 nonce = 1;
+  uint64 sent_time_us = 2;
+}
+
+message Pong {
+  uint64 nonce = 1;
+  uint64 sent_time_us = 2;
+}
+
+enum NoticeKind {
+  NOTICE_KIND_UNSPECIFIED = 0;
+  NOTICE_KIND_SECURE_DESKTOP = 1;       // UAC / login screen active
+  NOTICE_KIND_SECURE_DESKTOP_UNAVAILABLE = 2; // support session without the service
+  NOTICE_KIND_SESSION_SWITCHING = 3;    // host process restarting into another session
+  NOTICE_KIND_LOCAL_USER_ACTIVE = 4;
+}
+
+message Notice {
+  NoticeKind kind = 1;
+  string message = 2;
+}
+
+enum ByeReason {
+  BYE_REASON_UNSPECIFIED = 0;
+  BYE_REASON_USER_CLOSED = 1;
+  BYE_REASON_HOST_USER_ENDED = 2;
+  BYE_REASON_IDLE_TIMEOUT = 3;
+  BYE_REASON_PROTOCOL_ERROR = 4;
+  BYE_REASON_HOST_SHUTDOWN = 5;
+  BYE_REASON_RESUMABLE = 6;             // session switch: reconnect with resume_token
+}
+
+message Bye {
+  ByeReason reason = 1;
+  bytes resume_token = 2;               // lets the viewer reconnect without the PIN for 60 s
+}

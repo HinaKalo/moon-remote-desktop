@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="https://github.com/HinaKalo/lumen"
+             xmlns:vm="using:MoonRemote.ViewModels"
+             xmlns:text="using:MoonRemote.Services"
+             xmlns:m="using:MoonRemote.Models"
+             x:Class="MoonRemote.Views.DevicesPage"
+             x:DataType="vm:DevicesPageViewModel"
+             x:Name="Root">
+  <ScrollViewer>
+    <StackPanel Classes="page" Spacing="16">
+      <l:SectionHeader Title="{x:Static text:OnboardingText.Devices}"
+                       Description="{Binding StatusMessage}" />
+
+      <l:Card Header="{x:Static text:OnboardingText.Account}" Description="{Binding UserDisplayName}">
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+          <Button Classes="primary" Content="{x:Static text:OnboardingText.SignIn}"
+                  IsVisible="{Binding !IsSignedIn}"
+                  IsEnabled="{Binding !IsBusy}"
+                  Command="{Binding SignInCommand}" />
+          <Button Content="{x:Static text:OnboardingText.Refresh}"
+                  IsVisible="{Binding IsSignedIn}"
+                  IsEnabled="{Binding !IsBusy}"
+                  Command="{Binding RefreshCommand}" />
+          <Button Classes="ghost" Content="{x:Static text:OnboardingText.SignOut}"
+                  IsVisible="{Binding IsSignedIn}"
+                  IsEnabled="{Binding !IsBusy}"
+                  Command="{Binding SignOutCommand}" />
+        </StackPanel>
+      </l:Card>
+
+      <l:Card Header="{x:Static text:OnboardingText.YourDevices}" Description="{x:Static text:OnboardingText.DeviceSummary}">
+        <StackPanel Spacing="8" Margin="0,8,0,0">
+          <TextBox PlaceholderText="Search by device name or ID"
+                   AutomationProperties.Name="Search devices"
+                   IsVisible="{Binding HasDevices}" Text="{Binding DeviceSearch}"
+                   HorizontalAlignment="Left" Width="280" />
+          <TextBlock Text="No devices match this search." IsVisible="{Binding NoSearchResults}" />
+          <ItemsControl ItemsSource="{Binding VisibleDevices}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="m:DeviceItem">
+                <Border Padding="12,10" Margin="0,0,0,8" CornerRadius="8" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}">
+                  <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                    <StackPanel Spacing="2">
+                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                      <TextBlock Text="{Binding Id}" Opacity="0.65" FontSize="12" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                               IsVisible="{Binding Online}" Text="Online"
+                               Foreground="{DynamicResource Lumen.Brush.Success}" />
+                    <TextBlock Grid.Column="1" VerticalAlignment="Center"
+                               IsVisible="{Binding !Online}" Text="Offline"
+                               Foreground="{DynamicResource Lumen.Brush.TextSecondary}" />
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                      <Button Classes="primary" Content="Connect"
+                              Command="{Binding #Root.((vm:DevicesPageViewModel)DataContext).ConnectDeviceCommand}"
+                              CommandParameter="{Binding}" />
+                      <Button Classes="ghost" Content="Remove"
+                              IsEnabled="{Binding !#Root.((vm:DevicesPageViewModel)DataContext).IsBusy}"
+                              Command="{Binding #Root.((vm:DevicesPageViewModel)DataContext).RemoveDeviceCommand}"
+                              CommandParameter="{Binding}" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </l:Card>
+
+      <l:Card Header="Direct LAN Connect" Description="Connect directly to a host IP when the server or EasyTier is unavailable.">
+        <StackPanel Spacing="10" Margin="0,8,0,0" MaxWidth="480" HorizontalAlignment="Left">
+          <l:FormField Label="Host IP:Port">
+            <TextBox Text="{Binding LanAddress}" PlaceholderText="192.168.1.50:47000" />
+          </l:FormField>
+          <l:FormField Label="Host Public Key (base64)">
+            <TextBox Text="{Binding LanHostKey}" PlaceholderText="Base64 Ed25519 key" />
+          </l:FormField>
+          <Button Content="Connect directly" HorizontalAlignment="Left" Command="{Binding ConnectLanCommand}" />
+        </StackPanel>
+      </l:Card>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

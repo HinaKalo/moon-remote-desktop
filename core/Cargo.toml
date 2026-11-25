@@ -1,0 +1,13 @@
+[workspace]
+resolver = "3"
+members = ["crates/moonrd-et", "crates/moonrd-proto", "crates/moonrd-session", "crates/moonrd-transport", "crates/packet-stub", "crates/moonrd-service", "crates/moonrd-media", "crates/moonrd-agent", "crates/moonrd-ffi", "crates/moonrd-host"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.91"
+license = "MIT"
+publish = false
+
+[profile.release.package.packet-stub]
+opt-level = "z"

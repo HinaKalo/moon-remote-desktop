@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="MoonRemote.Views.SendTextWindow"
+        Title="Send text"
+        Width="440" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+  <StackPanel Margin="16" Spacing="12">
+    <TextBox x:Name="TextToSend" MaxLength="1024"
+             PlaceholderText="Type with this computer’s input method"
+             AutomationProperties.Name="Text to send" />
+    <TextBlock x:Name="SendError" IsVisible="False" TextWrapping="Wrap"
+               Text="Text could not be sent. Try again when the connection is ready." />
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+      <Button Content="Cancel" IsCancel="True" Click="OnCancel" />
+      <Button x:Name="SendButton" Content="Send · Enter" Classes="primary" IsDefault="True"
+              IsEnabled="False" Click="OnSend" />
+    </StackPanel>
+  </StackPanel>
+</Window>

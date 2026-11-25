@@ -1,0 +1,53 @@
+[package]
+name = "moonrd-service"
+description = "Moon Remote host service (Windows, LocalSystem): device identity, PIN and pairing state, UI pipe API, session agent supervision."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "moonrd-service"
+path = "src/main.rs"
+
+[dependencies]
+moonrd-et = { path = "../moonrd-et" }
+moonrd-proto = { path = "../moonrd-proto" }
+moonrd-session = { path = "../moonrd-session" }
+moonrd-transport = { path = "../moonrd-transport" }
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+bytes = "1"
+futures-util = "0.3"
+rand_core = { version = "0.6", features = ["getrandom"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls-native-roots"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+thiserror = "2"
+time = { version = "0.3", features = ["parsing"] }
+zeroize = "1.9"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "sync", "time", "process"] }
+tokio-tungstenite = { version = "0.26", default-features = false, features = ["connect", "rustls-tls-native-roots"] }
+webrtc = "0.14"
+
+[target.'cfg(windows)'.dependencies]
+windows-service = "0.8"
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Security_Cryptography",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Memory",
+    "Win32_System_RemoteDesktop",
+    "Win32_System_Threading",
+    "Win32_System_JobObjects",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Pipes",
+    "Win32_System_Environment",
+] }
+
+[dev-dependencies]
+tempfile = "3"

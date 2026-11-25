@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="https://github.com/HinaKalo/lumen"
+             xmlns:vm="using:MoonRemote.ViewModels"
+             xmlns:text="using:MoonRemote.Services"
+             x:Class="MoonRemote.Views.HostPage"
+             x:DataType="vm:HostPageViewModel">
+  <ScrollViewer>
+    <StackPanel Classes="page" Spacing="16">
+      <l:SectionHeader Title="{x:Static text:OnboardingText.ThisPc}"
+                       Description="{Binding StatusMessage}" />
+
+      <l:Card IsVisible="{Binding !IsSignedIn}" Header="{x:Static text:OnboardingText.Account}"
+              Description="{x:Static text:OnboardingText.SignInFirst}">
+        <Button Classes="primary" Content="{x:Static text:OnboardingText.SignIn}"
+                HorizontalAlignment="Left" Margin="0,8,0,0" Click="OnSignInClick" />
+      </l:Card>
+
+      <UniformGrid Columns="3" Margin="-8,0">
+        <l:StatCard Margin="8" Label="EasyTier" Value="{Binding EtStatus}" Icon="Globe" Caption="{x:Static text:OnboardingText.VirtualNetwork}" />
+        <l:StatCard Margin="8" Label="{x:Static text:OnboardingText.Signalling}" Value="{Binding SignalStatus}" Icon="CircleCheck" Caption="{x:Static text:OnboardingText.Presence}" />
+        <l:StatCard Margin="8" Label="{x:Static text:OnboardingText.SessionAgent}" Value="{Binding AgentStatus}" Icon="MousePointer" Caption="{x:Static text:OnboardingText.Capture}" />
+      </UniformGrid>
+
+      <l:Card Header="{x:Static text:OnboardingText.RemoteAccess}" Description="{x:Static text:OnboardingText.HostSetupHint}">
+        <StackPanel Spacing="12" Margin="0,8,0,0" MaxWidth="420" HorizontalAlignment="Left">
+          <l:FormField Label="{x:Static text:OnboardingText.HostName}">
+            <TextBox Text="{Binding HostName}" />
+          </l:FormField>
+          <l:FormField Label="{x:Static text:OnboardingText.ConnectionPin}" Hint="{Binding PinHint}">
+            <TextBox Text="{Binding Pin}" PasswordChar="•" PlaceholderText="{x:Static text:OnboardingText.PinLength}" />
+          </l:FormField>
+          <CheckBox Content="{x:Static text:OnboardingText.LanAccess}"
+                    IsEnabled="{Binding ServiceRunning}"
+                    IsChecked="{Binding LanDirect}"
+                    Command="{Binding ToggleLanDirectCommand}" />
+        </StackPanel>
+        <l:Card.Footer>
+          <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+            <Button Classes="ghost" Content="{Binding ServiceButtonText}"
+                    IsVisible="{Binding !ServiceRunning}"
+                    IsEnabled="{Binding !IsBusy}"
+                    Command="{Binding InstallSystemServiceCommand}" />
+            <Button Classes="ghost" Content="{x:Static text:OnboardingText.Refresh}" Command="{Binding RefreshStatusCommand}" />
+            <Button Classes="ghost" Content="{x:Static text:OnboardingText.Unregister}" IsVisible="{Binding IsRegistered}" Command="{Binding UnregisterCommand}" />
+            <Button Classes="primary" Content="{Binding SaveButtonText}"
+                    IsEnabled="{Binding CanEnableHost}"
+                    Command="{Binding EnableHostAndSetPinCommand}" />
+          </StackPanel>
+        </l:Card.Footer>
+      </l:Card>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

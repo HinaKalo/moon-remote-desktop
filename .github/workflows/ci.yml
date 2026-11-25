@@ -1,0 +1,63 @@
+# CI：与 scripts/build.ps1 一致——Go 服务端、Web 控制端、Rust 核心与 C# 桌面端（Windows）、安全扫描。
+# EasyTier 集成测试需要 MRD_TEST_ET_DIR，数据库契约测试需要 MRD_TEST_DSN，未配置时自动跳过。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    uses: HinaKalo/moon-infra/.github/workflows/ci-go.yml@main
+    with:
+      working-directory: server
+
+  web:
+    uses: HinaKalo/moon-infra/.github/workflows/ci-node.yml@main
+    with:
+      working-directory: server/web
+
+  core:
+    name: Rust core (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: core
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: core
+      - name: clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: test
+        run: cargo test
+
+  app:
+    name: Desktop app (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - name: build
+        run: dotnet build app/MoonRemote.slnx -c Debug -nologo -warnaserror
+      - name: test
+        run: dotnet test app/MoonRemote.slnx -c Debug --no-build -nologo
+
+  security:
+    uses: HinaKalo/moon-infra/.github/workflows/security.yml@main
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
