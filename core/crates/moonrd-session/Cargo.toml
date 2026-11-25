@@ -12,7 +12,7 @@ moonrd-proto = { path = "../moonrd-proto" }
 prost = "0.14"
 spake2 = "0.4"
 argon2 = "0.5"
-base64 = "0.22"
+base64 = "0.23"
 ed25519-dalek = "2"
 hmac = "0.12"
 sha2 = "0.10"

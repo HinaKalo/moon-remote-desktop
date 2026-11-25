@@ -14,7 +14,7 @@ path = "src/main.rs"
 [dependencies]
 moonrd-service = { path = "../moonrd-service" }
 moonrd-session = { path = "../moonrd-session" }
-base64 = "0.22"
+base64 = "0.23"
 ed25519-dalek = { version = "2", features = ["rand_core"] }
 rand_core = { version = "0.6", features = ["getrandom"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls-native-roots"] }
