@@ -12,4 +12,4 @@ prost = "0.14"
 
 [build-dependencies]
 prost-build = "0.14"
-protox = "0.9"
+protox = "0.10"
