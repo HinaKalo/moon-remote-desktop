@@ -11,7 +11,7 @@ publish.workspace = true
 moonrd-proto = { path = "../moonrd-proto" }
 prost = "0.14"
 spake2 = "0.4"
-argon2 = "0.5"
+argon2 = "0.6"
 base64 = "0.22"
 ed25519-dalek = "2"
 hmac = "0.12"
