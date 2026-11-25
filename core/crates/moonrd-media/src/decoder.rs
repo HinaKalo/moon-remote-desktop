@@ -236,7 +236,10 @@ mod tests {
         let Ok(adapter) = gpu::default_adapter() else {
             return; // headless environment without DXGI adapter
         };
-        let g = gpu::create_device(&adapter).unwrap();
+        // CI 虚拟机只有软件渲染适配器，无法创建硬件编解码所需的 D3D11 设备：同样视为无 GPU 环境跳过
+        let Ok(g) = gpu::create_device(&adapter) else {
+            return;
+        };
         let mgr = gpu::create_dxgi_device_manager(&g.device).unwrap();
 
         let (w, h, fps) = (640, 360, 30);
