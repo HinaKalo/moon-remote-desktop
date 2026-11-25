@@ -1341,7 +1341,7 @@ version = "0.1.0"
 name = "moonrd-ffi"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "ed25519-dalek",
  "moonrd-et",
  "moonrd-media",
@@ -1361,7 +1361,7 @@ dependencies = [
 name = "moonrd-host"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "ed25519-dalek",
  "moonrd-service",
  "moonrd-session",
@@ -1397,7 +1397,7 @@ dependencies = [
 name = "moonrd-service"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "bytes",
  "ed25519-dalek",
  "futures-util",
@@ -1426,7 +1426,7 @@ name = "moonrd-session"
 version = "0.1.0"
 dependencies = [
  "argon2",
- "base64 0.22.1",
+ "base64 0.23.1",
  "ed25519-dalek",
  "hex",
  "hmac",

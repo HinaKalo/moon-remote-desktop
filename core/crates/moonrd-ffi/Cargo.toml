@@ -16,7 +16,7 @@ moonrd-media = { path = "../moonrd-media" }
 moonrd-proto = { path = "../moonrd-proto" }
 moonrd-session = { path = "../moonrd-session" }
 moonrd-transport = { path = "../moonrd-transport" }
-base64 = "0.22"
+base64 = "0.23"
 ed25519-dalek = { version = "2", features = ["rand_core"] }
 rand_core = { version = "0.6", features = ["getrandom"] }
 serde = { version = "1", features = ["derive"] }
